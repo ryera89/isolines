@@ -1,0 +1,12 @@
+#ifndef LDLDCMP_H
+#define LDLDCMP_H
+
+#include "mathmatrix.h"
+
+class ldldcmp{
+    
+}
+
+
+
+#endif // LDLDCMP_H

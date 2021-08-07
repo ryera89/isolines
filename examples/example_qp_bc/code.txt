@@ -1,0 +1,65 @@
+>> % Draw the tent poles.
+largeL = zeros(36);
+mask = [6 7 30 31];
+largeL(mask,mask) = .3*ones(4);
+largeL(18:19,18:19) = .5*ones(2);
+xx = [1:5,5:6,6:15,15:16,16:25,25:26,26:30];
+[XX,YY] = meshgrid(xx) ;
+axis([1 30 1 30 0 .5],'off');
+surface(XX,YY,largeL,'facecolor',[.5 .5 .5],'edgecolor','none');
+light;
+colormap(gray);
+view([-20,30]);
+title('The set of tent poles')
+>> L = zeros(30);
+E = ones(2);
+L(15:16,15:16) = .5*E;
+L(5:6,5:6) = .3*E; 
+L(25:26,5:6) = .3*E;
+L(5:6,25:26) = .3*E; 
+L(25:26,25:26) = .3*E;
+
+% Add L to the plot.
+surface(L,'facecolor','none','edgecolor','m');
+title('Lower Bound Constraint Surface')
+>> sstart = .5*ones(30,30);
+
+% Add it to the plot.
+surface(sstart,'FaceColor','none','LineStyle','none', ...
+   'Marker','.','MarkerEdgeColor','blue')
+title('Initial Value (blue) and Lower Bound (magenta)');
+fig = gcf;
+fig.Renderer = 'zbuffer';  % Markers do not show up in OpenGL.
+>> low = reshape(L,900,1);
+xstart = reshape(sstart,900,1);
+
+% Illustrate the reordering.
+% Draw grid points.
+xx = 0:4;
+[X, Y] = meshgrid(xx,xx);
+gpts = plot(X(:),Y(:),'b.');
+gpts.MarkerSize = 10;
+axis off
+axis([-2 12 -1.5 5.5])
+hold on
+% Draw arrow.
+l(1) = line([7.5 6.5],[2 2.5]);
+l(2) = line([7.5 6.5],[2 1.5]);
+l(3) = line([7.5 5.5],[2 2]);
+set(l,'color','b');
+% Draw vector.
+yy = 0.2*xx;
+zz = [-1.5+yy,yy,1.5+yy,3+yy,4.5+yy];
+vect = plot(9*ones(25,1),zz,'b.');
+vect.MarkerSize = 9;
+axis off;
+hold off;
+>> H = delsq(numgrid('S',30+2));
+h = 1/(30-1);
+c = -h^2*ones(30^2,1);
+>> options = optimoptions('quadprog','Algorithm','trust-region-reflective',...
+    'Display','off');
+x = quadprog(H, c, [], [], [], [], low, [], xstart, options); tic; toc;
+>> xt = transp(x);
+>> val = 0.5*xt*H*x + xt*c;
+>> val
